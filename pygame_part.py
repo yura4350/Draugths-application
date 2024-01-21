@@ -13,16 +13,17 @@ ROWS, COLS = board_parameters.get_rows(), board_parameters.get_cols()
 SQUARE_SIZE = board_parameters.get_square_size()
 
 
-
+#setting FPS
 FPS = 60
 
+#get the position of the mouse
 def get_row_col_from_mouse(pos):
     x, y = pos
     row = y // board_parameters.get_square_size()
     col = x // board_parameters.get_square_size()
     return row, col
 
-def run_pygame():
+def run_pygame(mode, color=None, difficulty=None):
     WIN = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption('Checkers')
     run = True
@@ -32,9 +33,21 @@ def run_pygame():
     while run:
         clock.tick(FPS)
 
-        if game.turn == WHITE:
-            value, new_board = minimax(game.get_board(), 4, True, game, -100, 100)
-            game.ai_move(new_board)
+        #check the mode of play:
+        if mode == "player_vs_computer":
+
+            #length of analysis - how many moves ahead does the algorithm analyse
+            length_of_analysis = int(difficulty)+3
+
+            #create the conditions for user playing for different colors
+            if color == "Red":
+                if game.turn == WHITE:
+                    value, new_board = minimax(game.get_board(), length_of_analysis, True, game, -100, 100)
+                    game.ai_move(new_board)
+            else:
+                if game.turn == RED:
+                    value, new_board = minimax(game.get_board(), length_of_analysis, False, game, -100, 100)
+                    game.ai_move(new_board)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -49,9 +62,11 @@ def run_pygame():
 
     pygame.quit()
 
-# This function will start the Pygame loop in a new thread
+# Starting pygame loop in a new thread
 def start_pygame_thread(mode = None, color=None, difficulty=None, board_size=None):
     print(mode, color, difficulty, board_size)
+
+    #setting parameters of the board according to user's choice
     if mode == "player_vs_computer":
         print(1, 1)
         if board_size == "8x8":
@@ -60,14 +75,17 @@ def start_pygame_thread(mode = None, color=None, difficulty=None, board_size=Non
             board_parameters.set_rows_cols(10, 10)
         else:
             board_parameters.set_rows_cols(12, 12)
+        pygame_thread = threading.Thread(target=run_pygame(mode, color, difficulty))
 
-    if mode == "player_vs_player":
+    elif mode == "player_vs_player":
         if board_size == "8x8":
             board_parameters.set_rows_cols(8, 8)
         elif board_size == "10x10":
             board_parameters.set_rows_cols(10, 10)
         else:
             board_parameters.set_rows_cols(12, 12)
-    pygame_thread = threading.Thread(target=run_pygame)
+        pygame_thread = threading.Thread(target=run_pygame(mode))
+
+
     pygame_thread.daemon = True
     pygame_thread.start()

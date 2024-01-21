@@ -7,6 +7,7 @@ import threading
 import os
 import tkinter as tk
 from pygame_part import *
+from checkers.constants import *
 
 def setup_database():
     conn = sqlite3.connect('users.db')
