@@ -51,6 +51,19 @@ def run_pygame(mode, color=None, difficulty=None):
 
                 # Check for game actions
             if shared_state.game_actions["offer_draw"]:
+                #Implementing draw offer logic so that for more than 1.0 for whtie and -1.0 for red threshold in evaluation computer accepted the draw
+                Eval, position = minimax(game.get_board(), length_of_analysis, True, game, -100, 100)
+                print(Eval)
+
+
+                if color == "Red" and Eval <= -1.0:
+                    shared_state.game_actions["draw_accept"] = True
+                    run = False
+
+                elif color == "White" and Eval >= 1.0:
+                    shared_state.game_actions["draw_accept"] = True
+                    run = False
+
                 # Handle draw offer logic
                 shared_state.game_actions["offer_draw"] = False  # Reset flag after handling
 

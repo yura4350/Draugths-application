@@ -268,7 +268,8 @@ def create_game_vs_computer_interface(mode, color, difficulty, board_size):
     draw_button = ctk.CTkButton(control_frame, text="Offer a Draw", command=offer_draw)
     draw_button.pack(pady=10)
 
-    surrender_button = ctk.CTkButton(control_frame, text="Surrender", command=surrender)
+    surrender_button = ctk.CTkButton(control_frame, text="Surrender",
+                                     command=lambda: surrender(color))
     surrender_button.pack(pady=10)
 
     analysis_bar_button = ctk.CTkButton(control_frame, text="Hide the Analysis Bar", command=toggle_analysis_bar)
@@ -325,10 +326,21 @@ def red_surrender():
 
 def offer_draw():
     shared_state.game_actions["offer_draw"] = True
+    while shared_state.game_actions["offer_draw"] == True:
+        print(1)
+        if shared_state.game_actions["draw_accept"] == True:
+            save_game("1-1")
+            shared_state.game_actions["draw_accept"] = False
 
-def surrender():
+def surrender(color):
     shared_state.game_actions["surrender"] = True
-    show_main_menu()
+
+    #check the color the user played for
+    if color == "Red":
+        save_game("2-0")
+
+    else:
+        save_game("2-0")
 
 def toggle_analysis_bar():
     # Implement the functionality to show/hide the analysis bar
