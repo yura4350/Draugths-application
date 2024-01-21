@@ -8,8 +8,10 @@ import os
 import tkinter as tk
 from pygame_part import *
 from checkers.constants import *
+import shared_state
+from datetime import datetime
 
-def setup_database():
+def setup_users_database():
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
     cursor.execute('''
@@ -21,7 +23,24 @@ def setup_database():
     conn.commit()
     conn.close()
 
-setup_database()
+setup_users_database()
+
+def setup_game_results_database():
+    conn = sqlite3.connect('game_results.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS game_results (
+            id INTEGER PRIMARY KEY,
+            player1 TEXT NOT NULL,
+            player2 TEXT NOT NULL,
+            result TEXT NOT NULL,
+            game_date TEXT NOT NULL
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+setup_game_results_database()
 
 def check_credentials(username, password):
     conn = sqlite3.connect('users.db')
@@ -38,9 +57,39 @@ def check_credentials(username, password):
 def add_user(username, password):
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
+    cursor.execute('SELECT * FROM users WHERE username=?', (username,))
+    if cursor.fetchone():
+        return False  # User already exists
     cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
     conn.commit()
     conn.close()
+    return True
+
+def show_registration_form():
+    clear_window()
+    app.title('Register New User')
+
+    username_reg_entry = ctk.CTkEntry(app, placeholder_text="Username")
+    username_reg_entry.pack(pady=10)
+
+    password_reg_entry = ctk.CTkEntry(app, placeholder_text="Password", show="*")
+    password_reg_entry.pack(pady=10)
+
+    def attempt_registration():
+        username = username_reg_entry.get()
+        password = password_reg_entry.get()
+        if add_user(username, password):
+            tkinter.messagebox.showinfo("Registration", "Registration successful!")
+            show_main_menu()  # Or any other appropriate action
+        else:
+            tkinter.messagebox.showerror("Registration", "Username already exists!")
+
+    register_button = ctk.CTkButton(app, text="Register", command=attempt_registration)
+    register_button.pack(pady=10)
+
+    back_button = ctk.CTkButton(app, text="Sign-in", command=show_main_menu)
+    back_button.pack(pady=10)
+
 
 # Example users
 add_user("user1", "pass1")
@@ -55,6 +104,9 @@ username_entry.pack(pady=10)
 
 password_entry = ctk.CTkEntry(app, placeholder_text="Password", show="*")
 password_entry.pack(pady=10)
+
+register_button = ctk.CTkButton(app, text="Register New User", command=show_registration_form)
+register_button.pack(pady=10)
 
 status_label = ctk.CTkLabel(app, text="")
 status_label.pack(pady=10)
@@ -82,8 +134,7 @@ def quit_to_desktop():
 
 # This function will be called after a successful login
 def show_main_menu():
-    for widget in app.winfo_children():
-        widget.destroy()
+    clear_window()
 
     app.title('Main Menu')
 
@@ -91,13 +142,13 @@ def show_main_menu():
     main_menu_label.pack(pady=20)
 
     start_game_button = ctk.CTkButton(app, text="Start a Game", command=start_game)
-    start_game_button.pack(fill='x', padx=50, pady=10)
+    start_game_button.pack(pady=10)
 
     load_game_button = ctk.CTkButton(app, text="Load a Game", command=load_game)
-    load_game_button.pack(fill='x', padx=50, pady=10)
+    load_game_button.pack(pady=10)
 
     quit_button = ctk.CTkButton(app, text="Quit to the Desktop", command=quit_to_desktop)
-    quit_button.pack(fill='x', padx=50, pady=10)
+    quit_button.pack(pady=10)
 
 
 def choose_game_type():
@@ -109,10 +160,10 @@ def choose_game_type():
     title_label.pack(pady=20)
 
     against_computer_button = ctk.CTkButton(app, text="Against a computer", command=play_game_vs_computer)
-    against_computer_button.pack(fill='x', padx=50, pady=10)
+    against_computer_button.pack(pady=10)
 
     against_friend_button = ctk.CTkButton(app, text="Against a friend", command=play_game_vs_player)
-    against_friend_button.pack(fill='x', padx=50, pady=10)
+    against_friend_button.pack(pady=10)
 
 
 # Define the functions that are called when the buttons are pressed
@@ -241,14 +292,14 @@ def create_game_vs_player_interface(mode, board_size):
     control_frame = ctk.CTkFrame(app)
     control_frame.pack(side="right", fill="both", expand=True)
 
-    draw_button = ctk.CTkButton(control_frame, text="White Surrender", command=white_surrender())
+    draw_button = ctk.CTkButton(control_frame, text="Draw", command=draw)
     draw_button.pack(pady=10)
 
-    surrender_button = ctk.CTkButton(control_frame, text="Red Surrender", command=red_surrender())
+    surrender_button = ctk.CTkButton(control_frame, text="Red surrender", command=red_surrender)
     surrender_button.pack(pady=10)
 
-    return_button = ctk.CTkButton(control_frame, text="Draw", command=draw)
-    return_button.pack(pady=10)
+    surrender_button = ctk.CTkButton(control_frame, text="White surrender", command=white_surrender)
+    surrender_button.pack(pady=10)
 
     analysis_bar_button = ctk.CTkButton(control_frame, text="Hide the Analysis Bar", command=toggle_analysis_bar)
     analysis_bar_button.pack(pady=10)
@@ -259,21 +310,25 @@ def create_game_vs_player_interface(mode, board_size):
     start_pygame_thread(mode=mode, board_size=board_size)
 
 def draw():
-    pass
+    shared_state.game_actions["draw"] = True
+    save_game("1-1")
+
 
 def white_surrender():
-    pass
+    shared_state.game_actions["white_surrender"] = True
+    save_game("0-2")
+
 
 def red_surrender():
-    pass
+    shared_state.game_actions["red_surrender"] = True
+    save_game("2-0")
 
 def offer_draw():
-    # Implement the offer draw functionality
-    pass
+    shared_state.game_actions["offer_draw"] = True
 
 def surrender():
-    # Implement the surrender functionality
-    pass
+    shared_state.game_actions["surrender"] = True
+    show_main_menu()
 
 def toggle_analysis_bar():
     # Implement the functionality to show/hide the analysis bar
@@ -281,8 +336,40 @@ def toggle_analysis_bar():
 
 def return_to_main_menu():
     # Implement the functionality to return to the main menu
-    pass
+    shared_state.game_actions["end_game"] = True
+    show_main_menu()
 
+def save_game(result):
+    save_window = ctk.CTkToplevel(app)
+    save_window.title("Save Game Result")
+    save_window.geometry("300x200")
+
+    ctk.CTkLabel(save_window, text="Player 1 Name:").pack(pady=5)
+    player1_entry = ctk.CTkEntry(save_window)
+    player1_entry.pack(pady=5)
+
+    ctk.CTkLabel(save_window, text="Player 2 Name:").pack(pady=5)
+    player2_entry = ctk.CTkEntry(save_window)
+    player2_entry.pack(pady=5)
+
+    def submit_result():
+        player1 = player1_entry.get()
+        player2 = player2_entry.get()
+        game_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        save_result_to_db(player1, player2, result, game_date)
+        save_window.destroy()
+        show_main_menu()
+
+    submit_button = ctk.CTkButton(save_window, text="Submit", command=submit_result)
+    submit_button.pack(pady=10)
+
+def save_result_to_db(player1, player2, result, game_date):
+    conn = sqlite3.connect('game_results.db')
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO game_results (player1, player2, result, game_date) VALUES (?, ?, ?, ?)',
+                   (player1, player2, result, game_date))
+    conn.commit()
+    conn.close()
 
 
 app.mainloop()

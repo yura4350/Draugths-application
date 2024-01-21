@@ -1,10 +1,10 @@
 import pygame
 import threading
-import pygame
 from checkers.game import Game
 from minimax.algorithm import minimax
 from checkers import board_parameters
 from checkers.constants import *
+import shared_state
 
 # Using getter functions
 WIDTH = board_parameters.get_width()
@@ -49,6 +49,36 @@ def run_pygame(mode, color=None, difficulty=None):
                     value, new_board = minimax(game.get_board(), length_of_analysis, False, game, -100, 100)
                     game.ai_move(new_board)
 
+                # Check for game actions
+            if shared_state.game_actions["offer_draw"]:
+                # Handle draw offer logic
+                shared_state.game_actions["offer_draw"] = False  # Reset flag after handling
+
+            if shared_state.game_actions["surrender"]:
+                # Handle surrender logic
+                run = False  # Example action: stop the game loop
+
+            if shared_state.game_actions["end_game"]:
+                # Handle surrender logic
+                run = False  # Example action: stop the game loop
+        else:
+            if shared_state.game_actions["white_surrender"]:
+                # Handle surrender logic
+                run = False  # Example action: stop the game loop
+
+            if shared_state.game_actions["red_surrender"]:
+                # Handle surrender logic
+                run = False  # Example action: stop the game loop
+
+            if shared_state.game_actions["draw"]:
+                # Handle surrender logic
+                run = False  # Example action: stop the game loop
+
+            if shared_state.game_actions["end_game"]:
+                # Handle surrender logic
+                run = False  # Example action: stop the game loop
+
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -75,7 +105,9 @@ def start_pygame_thread(mode = None, color=None, difficulty=None, board_size=Non
             board_parameters.set_rows_cols(10, 10)
         else:
             board_parameters.set_rows_cols(12, 12)
-        pygame_thread = threading.Thread(target=run_pygame(mode, color, difficulty))
+        pygame_thread = threading.Thread(target=run_pygame, args=(mode, color, difficulty))
+        pygame_thread.daemon = True
+        pygame_thread.start()
 
     elif mode == "player_vs_player":
         if board_size == "8x8":
@@ -84,8 +116,8 @@ def start_pygame_thread(mode = None, color=None, difficulty=None, board_size=Non
             board_parameters.set_rows_cols(10, 10)
         else:
             board_parameters.set_rows_cols(12, 12)
-        pygame_thread = threading.Thread(target=run_pygame(mode))
+        pygame_thread = threading.Thread(target=run_pygame, args=(mode, color, difficulty))
+        pygame_thread.daemon = True
+        pygame_thread.start()
 
 
-    pygame_thread.daemon = True
-    pygame_thread.start()
