@@ -2,6 +2,11 @@ import sqlite3
 import customtkinter as ctk
 import tkinter.messagebox
 import sys
+import pygame
+import threading
+import os
+import tkinter as tk
+from pygame_part import *
 
 def setup_database():
     conn = sqlite3.connect('users.db')
@@ -96,8 +101,7 @@ def show_main_menu():
 
 def choose_game_type():
     # Clear the previous menu
-    for widget in app.winfo_children():
-        widget.destroy()
+    clear_window()
 
     # Create the new title and buttons for game type selection
     title_label = ctk.CTkLabel(app, text="Choose a type of game", font=("Roboto Medium", 16))
@@ -196,20 +200,15 @@ def clear_window():
 def set_color(color):
     print(f"Color chosen: {color}")  # Placeholder action
 
-import customtkinter as ctk
-import tkinter as tk
-
-# ... (other parts of your code)
-
 def create_game_vs_computer_interface():
     clear_window()
 
-    # Pygame integration setup
+    #Place for
     # This frame would be where the Pygame window is embedded or displayed
     game_frame = tk.Frame(app, width=600, height=600)
     game_frame.pack(side="left")
-    # run_pygame_loop() is a placeholder for your function to integrate Pygame
 
+    # Start the Pygame loop in a new thread
     # Control buttons setup
     control_frame = ctk.CTkFrame(app)
     control_frame.pack(side="right", fill="both", expand=True)
@@ -225,6 +224,8 @@ def create_game_vs_computer_interface():
 
     return_button = ctk.CTkButton(control_frame, text="Return to the Main Menu", command=return_to_main_menu)
     return_button.pack(pady=10)
+
+    start_pygame_thread()
 
 def create_game_vs_player_interface():
     clear_window()
@@ -254,10 +255,8 @@ def create_game_vs_player_interface():
     return_button = ctk.CTkButton(control_frame, text="Return to the Main Menu", command=return_to_main_menu)
     return_button.pack(pady=10)
 
-    # Similar setup for the human vs human game interface
-    # ...
+    start_pygame_thread()
 
-# Placeholder functions for the button commands
 def draw():
     pass
 
@@ -282,5 +281,7 @@ def toggle_analysis_bar():
 def return_to_main_menu():
     # Implement the functionality to return to the main menu
     pass
+
+
 
 app.mainloop()

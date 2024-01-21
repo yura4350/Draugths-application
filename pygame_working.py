@@ -1,82 +1,42 @@
+import threading
 import pygame
-import sys
+import tkinter as tk
+import customtkinter as ctk
+import os
 
-# Initialize Pygame
-pygame.init()
-
-# Set up the display
-screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption('Draughts Game')
-
-# Define colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
-GRAY = (200, 200, 200)
+# Pygame setup
+os.environ['SDL_VIDEO_WINDOW_POS'] = '100,100'  # Offset for where the pygame window appears
 
 
-# Button class
-class Button:
-    def __init__(self, color, x, y, width, height, text=''):
-        self.color = color
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.text = text
-
-    def draw(self, win):
-        # Call this method to draw the button on the screen
-        pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height), 0)
-
-        if self.text != '':
-            font = pygame.font.SysFont('comicsans', 30)
-            text = font.render(self.text, True, BLACK)
-            win.blit(text, (
-            self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 - text.get_height() / 2)))
-
-    def is_over(self, pos):
-        # Pos is the mouse position or a tuple of (x,y) coordinates
-        if pos[0] > self.x and pos[0] < self.x + self.width:
-            if pos[1] > self.y and pos[1] < self.y + self.height:
-                return True
-        return False
+def run_pygame():
+    pygame_part.init()
+    screen = pygame_part.display.set_mode((600, 600))
+    pygame_part.display.set_caption("Pygame Draughts Game")
+    running = True
+    while running:
+        for event in pygame_part.event.get():
+            if event.type == pygame_part.QUIT:
+                running = False
+        screen.fill((0, 0, 0))  # Placeholder for your game logic
+        pygame_part.display.flip()
+    pygame_part.quit()
 
 
-# Function to handle button events
-def button_event(button, event):
-    pos = pygame.mouse.get_pos()
+# Tkinter setup
+def start_game():
+    # Start the Pygame thread when the user clicks 'Start Game'
+    pygame_thread = threading.Thread(target=run_pygame, daemon=True)
+    pygame_thread.start()
 
-    if event.type == pygame.MOUSEBUTTONDOWN:
-        if button.is_over(pos):
-            print(f"{button.text} Button clicked!")
+    # Optionally, disable the button after starting the game
+    start_game_button.configure(state="disabled")
 
 
-# Create buttons
-surrender_button = Button(RED, 650, 100, 100, 50, 'Surrender')
-draw_button = Button(BLUE, 650, 200, 100, 50, 'Draw')
-return_button = Button(GREEN, 650, 300, 100, 50, 'Return')
+app = ctk.CTk()
+app.geometry('800x600')  # Tkinter window size
 
-buttons = [surrender_button, draw_button, return_button]
+start_game_button = ctk.CTkButton(app, text="Start Game", command=start_game)
+start_game_button.pack(pady=20)
 
-# Game loop
-running = True
-while running:
-    screen.fill(GRAY)
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-        for button in buttons:
-            button_event(button, event)
-
-    for button in buttons:
-        button.draw(screen)
-
-    pygame.display.update()
-
-pygame.quit()
-sys.exit()
+# Main loop
+app.mainloop()
