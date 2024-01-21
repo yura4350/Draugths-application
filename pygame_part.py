@@ -18,8 +18,8 @@ FPS = 60
 
 def get_row_col_from_mouse(pos):
     x, y = pos
-    row = y // SQUARE_SIZE
-    col = x // SQUARE_SIZE
+    row = y // board_parameters.get_square_size()
+    col = x // board_parameters.get_square_size()
     return row, col
 
 def run_pygame():
