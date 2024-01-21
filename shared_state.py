@@ -2,7 +2,7 @@
 game_actions = {
     "offer_draw": False,
     "surrender": False,
-    "hide_analysis_bar": False,
+    "show_analysis_bar": False,
     "end_game": False,
     "draw_accept":False,
     "white_surrender": False,

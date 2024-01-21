@@ -272,7 +272,7 @@ def create_game_vs_computer_interface(mode, color, difficulty, board_size):
                                      command=lambda: surrender(color))
     surrender_button.pack(pady=10)
 
-    analysis_bar_button = ctk.CTkButton(control_frame, text="Hide the Analysis Bar", command=toggle_analysis_bar)
+    analysis_bar_button = ctk.CTkButton(control_frame, text="Show/Hide the analysis", command=toggle_analysis_bar)
     analysis_bar_button.pack(pady=10)
 
     return_button = ctk.CTkButton(control_frame, text="Return to the Main Menu", command=return_to_main_menu)
@@ -302,8 +302,27 @@ def create_game_vs_player_interface(mode, board_size):
     surrender_button = ctk.CTkButton(control_frame, text="White surrender", command=white_surrender)
     surrender_button.pack(pady=10)
 
-    analysis_bar_button = ctk.CTkButton(control_frame, text="Hide the Analysis Bar", command=toggle_analysis_bar)
-    analysis_bar_button.pack(pady=10)
+    analysis_label = ctk.CTkLabel(app, text="Analysis: N/A")
+    analysis_label.pack_forget()  # Initially hide the label
+
+    # Step 3: Function to Update the Label
+    def update_analysis(text):
+        analysis_label.configure(text=text)
+        analysis_label.pack()  # Ensure the label is visible when updated
+
+    # Step 4: Toggle Visibility Function
+    def toggle_analysis():
+        if analysis_label.winfo_viewable():
+            analysis_label.pack_forget()
+        else:
+            analysis_label.pack()
+
+    # Button to toggle the analysis label
+    toggle_button = ctk.CTkButton(app, text="Show/Hide Analysis", command=toggle_analysis)
+    toggle_button.pack(pady=10)
+
+    # Example of updating the label - replace this with your actual analysis update
+    update_analysis("Analysis: 1.0")
 
     return_button = ctk.CTkButton(control_frame, text="Return to the Main Menu", command=return_to_main_menu)
     return_button.pack(pady=10)
@@ -343,8 +362,13 @@ def surrender(color):
         save_game("2-0")
 
 def toggle_analysis_bar():
-    # Implement the functionality to show/hide the analysis bar
-    pass
+
+    #changing the analysis bar
+    if shared_state.game_actions["show_analysis_bar"] == False:
+        shared_state.game_actions["show_analysis_bar"] == True
+
+    else:
+        shared_state.game_actions["show_analysis_bar"] == False
 
 def return_to_main_menu():
     # Implement the functionality to return to the main menu
