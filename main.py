@@ -130,9 +130,9 @@ def start_game_with_settings(mode = None, color=None, difficulty=None, board_siz
     print(f"Starting game with settings: Color: {color}, Difficulty: {difficulty}, Board Size: {board_size}")
     # Here you should call the actual game starting function and pass these settings
     if mode == "player_vs_computer":
-        create_game_vs_computer_interface()
+        create_game_vs_computer_interface(mode=mode, color=color, difficulty=difficulty, board_size=board_size)
     else:
-        create_game_vs_player_interface()
+        create_game_vs_player_interface(mode=mode, board_size=board_size)
 
 
 def create_game_vs_computer_settings():
@@ -200,7 +200,7 @@ def clear_window():
 def set_color(color):
     print(f"Color chosen: {color}")  # Placeholder action
 
-def create_game_vs_computer_interface():
+def create_game_vs_computer_interface(mode, color, difficulty, board_size):
     clear_window()
 
     #Place for
@@ -225,9 +225,9 @@ def create_game_vs_computer_interface():
     return_button = ctk.CTkButton(control_frame, text="Return to the Main Menu", command=return_to_main_menu)
     return_button.pack(pady=10)
 
-    start_pygame_thread()
+    start_pygame_thread(mode=mode, color=color, difficulty=difficulty, board_size=board_size)
 
-def create_game_vs_player_interface():
+def create_game_vs_player_interface(mode, board_size):
     clear_window()
 
     # Pygame integration setup
@@ -255,7 +255,7 @@ def create_game_vs_player_interface():
     return_button = ctk.CTkButton(control_frame, text="Return to the Main Menu", command=return_to_main_menu)
     return_button.pack(pady=10)
 
-    start_pygame_thread()
+    start_pygame_thread(mode=mode, board_size=board_size)
 
 def draw():
     pass

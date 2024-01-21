@@ -1,21 +1,33 @@
 import pygame
-from .constants import BLACK, ROWS, RED, SQUARE_SIZE, COLS, WHITE
 from .piece import Piece
+from checkers import board_parameters
+from checkers.constants import *
+
+# Using getter functions
+WIDTH = board_parameters.get_width()
+HEIGHT = board_parameters.get_height()
+ROWS, COLS = board_parameters.get_rows(), board_parameters.get_cols()
+SQUARE_SIZE = board_parameters.get_square_size()
+
 
 
 class Board:
     def __init__(self):
         self.board = []
-        self.red_left = ((ROWS-2) // 2) * COLS // 2
-        self.white_left = ((ROWS-2) // 2) * COLS // 2
+        self.ROWS = board_parameters.get_rows()
+        self.COLS = board_parameters.get_cols()
+        self.red_left = ((self.ROWS-2) // 2) * self.COLS // 2
+        self.white_left = ((self.ROWS-2) // 2) * self.COLS // 2
         self.red_kings = self.white_kings = 0
         self.create_board()
+        self.SQUARE_SIZE = board_parameters.get_square_size()
+
 
     def draw_squares(self, win):
         win.fill(BLACK)
-        for row in range(ROWS):
-            for col in range(row % 2, COLS, 2):
-                pygame.draw.rect(win, RED, (row * SQUARE_SIZE, col * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+        for row in range(self.ROWS):
+            for col in range(row % 2, self.COLS, 2):
+                pygame.draw.rect(win, RED, (row * self.SQUARE_SIZE, col * self.SQUARE_SIZE, self.SQUARE_SIZE, self.SQUARE_SIZE))
 
     def evaluate(self):
         evaluation = self.white_left - self.red_left + (self.white_kings * 2 - self.red_kings * 2)
@@ -44,7 +56,7 @@ class Board:
 
         #this piece of code checks the condition where a king should be made
         if piece.color == WHITE:
-            if row == ROWS - 1:
+            if row == self.ROWS - 1:
                 piece.make_king()
                 self.white_kings += 1
         else:
@@ -56,13 +68,13 @@ class Board:
         return self.board[row][col]
 
     def create_board(self):
-        for row in range(ROWS):
+        for row in range(self.ROWS):
             self.board.append([])
-            for col in range(COLS):
+            for col in range(self.COLS):
                 if col % 2 == ((row + 1) % 2):
-                    if row < ROWS // 2 - 1 :
+                    if row < self.ROWS // 2 - 1 :
                         self.board[row].append(Piece(row, col, WHITE))
-                    elif row > ROWS // 2:
+                    elif row > self.ROWS // 2:
                         self.board[row].append(Piece(row, col, RED))
                     else:
                         self.board[row].append(0)
@@ -71,8 +83,8 @@ class Board:
 
     def draw(self, win):
         self.draw_squares(win)
-        for row in range(ROWS):
-            for col in range(COLS):
+        for row in range(self.ROWS):
+            for col in range(self.COLS):
                 piece = self.board[row][col]
                 if piece != 0:
                     piece.draw(win)
@@ -103,34 +115,34 @@ class Board:
         if piece.color == RED and not piece.king:
             moves.update(self._traverse_left(row - 1, max(row - 3, -1), -1, piece.color, left, (piece.col, piece.row)))
             moves.update(self._traverse_right(row - 1, max(row - 3, -1), -1, piece.color, right, (piece.col, piece.row)))
-            moves.update(self._traverse_left(row + 1, min(row + 3, ROWS), 1, piece.color, left, (piece.col, piece.row)))
-            moves.update(self._traverse_right(row + 1, min(row + 3, ROWS), 1, piece.color, right, (piece.col, piece.row)))
+            moves.update(self._traverse_left(row + 1, min(row + 3, self.ROWS), 1, piece.color, left, (piece.col, piece.row)))
+            moves.update(self._traverse_right(row + 1, min(row + 3, self.ROWS), 1, piece.color, right, (piece.col, piece.row)))
             list_of_keys_to_delete = []
 
             for key, value in moves.items():
                 if key[0] == piece.row + 1:
                     list_of_keys_to_delete.append(key)
-            print(list_of_keys_to_delete)
+
             for key in list_of_keys_to_delete:
                 del moves[key]
         elif piece.color == WHITE and not piece.king:
             moves.update(self._traverse_left(row - 1, max(row - 3, -1), -1, piece.color, left, (piece.col, piece.row)))
             moves.update(self._traverse_right(row - 1, max(row - 3, -1), -1, piece.color, right, (piece.col, piece.row)))
-            moves.update(self._traverse_left(row + 1, min(row + 3, ROWS), 1, piece.color, left, (piece.col, piece.row)))
-            moves.update(self._traverse_right(row + 1, min(row + 3, ROWS), 1, piece.color, right, (piece.col, piece.row)))
+            moves.update(self._traverse_left(row + 1, min(row + 3, self.ROWS), 1, piece.color, left, (piece.col, piece.row)))
+            moves.update(self._traverse_right(row + 1, min(row + 3, self.ROWS), 1, piece.color, right, (piece.col, piece.row)))
             list_of_keys_to_delete = []
 
             for key, value in moves.items():
                 if key[0] == piece.row - 1:
                     list_of_keys_to_delete.append(key)
-            print(list_of_keys_to_delete)
+
             for key in list_of_keys_to_delete:
                 del moves[key]
         else:
             moves.update(self._traverse_left_king(row - 1, -1, -1, piece.color, left, (piece.col, piece.row)))
             moves.update(self._traverse_right_king(row - 1, -1, -1, piece.color, right, (piece.col, piece.row)))
-            moves.update(self._traverse_left_king(row + 1, ROWS, 1, piece.color, left, (piece.col, piece.row)))
-            moves.update(self._traverse_right_king(row + 1, ROWS, 1, piece.color, right, (piece.col, piece.row)))
+            moves.update(self._traverse_left_king(row + 1, self.ROWS, 1, piece.color, left, (piece.col, piece.row)))
+            moves.update(self._traverse_right_king(row + 1, self.ROWS, 1, piece.color, right, (piece.col, piece.row)))
 
             max_length = 0
 
@@ -261,9 +273,9 @@ class Board:
 
                         #created row and opposite_row to have the ability to move upwards and downwards by any piece (row - maximum in the direction we moved in before, opposite_row - the opposite direction)
                         row = max(r - 3, -1)
-                        opposite_row = min(r + 3, ROWS)
+                        opposite_row = min(r + 3, self.ROWS)
                     else:
-                        row = min(r + 3, ROWS)
+                        row = min(r + 3, self.ROWS)
                         opposite_row = max(r - 3, -1)
                     #record the current length of dict moves
                     length = [len(moves)]
@@ -283,7 +295,7 @@ class Board:
             #if there is a piece in the square and it is not of our color - then we can move further (last piece will be the piece we are jumping through now)
             else:
                 if current in skipped:
-                    print(11)
+
                     break
                 last = [current]
 
@@ -295,7 +307,7 @@ class Board:
         moves = {}
         last = []
         for r in range(start, stop, step):
-            if right >= COLS:
+            if right >= self.COLS:
                 break
 
             current = self.board[r][right]
@@ -312,9 +324,9 @@ class Board:
 
                         #description in traverse_left
                         row = max(r - 3, -1)
-                        opposite_row = min(r + 3, ROWS)
+                        opposite_row = min(r + 3, self.ROWS)
                     else:
-                        row = min(r + 3, ROWS)
+                        row = min(r + 3, self.ROWS)
                         opposite_row = max(r - 3, -1)
                     # record the current length of dict moves
                     length = [len(moves)]
@@ -328,11 +340,11 @@ class Board:
                 break
             elif current.color == color:
                 if current.col != initial_position[0] or current.row != initial_position[1]:
-                    print(11)
+
                     break
             else:
                 if current in skipped:
-                    print(1)
+
                     break
                 last = [current]
 
@@ -385,9 +397,9 @@ class Board:
 
                     # created row and opposite_row to have the ability to move upwards and downwards by any piece (row - maximum in the direction we moved in before, opposite_row - the opposite direction)
                     row = -1
-                    opposite_row = ROWS
+                    opposite_row = self.ROWS
                 else:
-                    row = ROWS
+                    row = self.ROWS
                     opposite_row = -1
                 # record the current length of dict moves
                 length = [len(moves)]
@@ -406,14 +418,14 @@ class Board:
             # if there is our piece in this square - we cant move here, so break
             elif current.color == color:
                 if current.col != initial_position[0] or current.row != initial_position[1]:
-                    print(11)
+
                     break
 
             # if there is a piece in the square and it is not of our color - then we can move further (last piece will be the piece we are jumping through now)
             else:
 
                 if current in passed:
-                    print(1)
+
                     break
                 last = [current]
                 passed = passed + last
@@ -432,7 +444,7 @@ class Board:
 
 
         for r in range(start, stop, step):
-            if right >= COLS:
+            if right >= self.COLS:
                 break
 
             current = self.board[r][right]
@@ -457,9 +469,9 @@ class Board:
 
                     # description in traverse_left
                     row = -1
-                    opposite_row = ROWS
+                    opposite_row = self.ROWS
                 else:
-                    row = ROWS
+                    row = self.ROWS
                     opposite_row = -1
                 # record the current length of dict moves
                 length = [len(moves)]
@@ -479,13 +491,13 @@ class Board:
 
             elif current.color == color:
                 if current.col != initial_position[0] or current.row != initial_position[1]:
-                    print(11)
+
                     break
 
 
             else:
                 if current in passed:
-                    print(1)
+
                     break
                 last = [current]
                 passed = passed + last

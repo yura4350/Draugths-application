@@ -1,13 +1,21 @@
 import pygame
 from copy import deepcopy
-from .constants import RED, WHITE, BLUE, SQUARE_SIZE
 from checkers.board import Board
+from checkers import board_parameters
+from checkers.constants import *
+
+# Using getter functions
+WIDTH = board_parameters.get_width()
+HEIGHT = board_parameters.get_height()
+ROWS, COLS = board_parameters.get_rows(), board_parameters.get_cols()
+SQUARE_SIZE = board_parameters.get_square_size()
 
 
 class Game:
     def __init__(self, win):
         self._init()
         self.win = win
+        self.SQUARE_SIZE = board_parameters.get_square_size()
 
 
     def update(self):
@@ -79,7 +87,7 @@ class Game:
         for move in moves:
             row, col = move
             pygame.draw.circle(self.win, BLUE,
-                                    (col * SQUARE_SIZE + SQUARE_SIZE // 2, row * SQUARE_SIZE + SQUARE_SIZE // 2), 15)
+                                    (col * self.SQUARE_SIZE + self.SQUARE_SIZE // 2, row * self.SQUARE_SIZE + self.SQUARE_SIZE // 2), 15)
 
 
     def change_turn(self):
