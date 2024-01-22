@@ -30,8 +30,16 @@ def run_pygame(mode, color=None, difficulty=None):
     clock = pygame.time.Clock()
     game = Game(WIN)
 
+
     while run:
         clock.tick(FPS)
+
+        #set length of analysis by pre-installed bar
+        bar_length_of_analysis = 4
+
+        # Getting the evaluation of the position
+        Eval, position = minimax(game.get_board(), bar_length_of_analysis, True, game, -100, 100)
+        shared_state.game_actions["Eval"] = round(Eval, 2)
 
         #check the mode of play:
         if mode == "player_vs_computer":
@@ -44,16 +52,16 @@ def run_pygame(mode, color=None, difficulty=None):
                 if game.turn == WHITE:
                     value, new_board = minimax(game.get_board(), length_of_analysis, True, game, -100, 100)
                     game.ai_move(new_board)
+
             else:
                 if game.turn == RED:
                     value, new_board = minimax(game.get_board(), length_of_analysis, False, game, -100, 100)
                     game.ai_move(new_board)
 
-                # Check for game actions
+                    # Check for game actions
             if shared_state.game_actions["offer_draw"]:
                 #Implementing draw offer logic so that for more than 1.0 for whtie and -1.0 for red threshold in evaluation computer accepted the draw
                 Eval, position = minimax(game.get_board(), length_of_analysis, True, game, -100, 100)
-                print(Eval)
 
 
                 if color == "Red" and Eval <= -1.0:
@@ -75,6 +83,7 @@ def run_pygame(mode, color=None, difficulty=None):
                 # Handle surrender logic
                 run = False  # Example action: stop the game loop
         else:
+
             if shared_state.game_actions["white_surrender"]:
                 # Handle surrender logic
                 run = False  # Example action: stop the game loop

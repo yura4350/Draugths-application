@@ -268,15 +268,35 @@ def create_game_vs_computer_interface(mode, color, difficulty, board_size):
     draw_button = ctk.CTkButton(control_frame, text="Offer a Draw", command=offer_draw)
     draw_button.pack(pady=10)
 
-    surrender_button = ctk.CTkButton(control_frame, text="Surrender",
-                                     command=lambda: surrender(color))
+    surrender_button = ctk.CTkButton(control_frame, text="Surrender", command=lambda: surrender(color))
     surrender_button.pack(pady=10)
-
-    analysis_bar_button = ctk.CTkButton(control_frame, text="Show/Hide the analysis", command=toggle_analysis_bar)
-    analysis_bar_button.pack(pady=10)
 
     return_button = ctk.CTkButton(control_frame, text="Return to the Main Menu", command=return_to_main_menu)
     return_button.pack(pady=10)
+
+    analysis_label = ctk.CTkLabel(control_frame, text="Analysis: N/A")
+    analysis_label.pack_forget()  # Initially hide the label
+
+    def update_analysis(text):
+        analysis_label.configure(text=text)
+        if not analysis_label.winfo_viewable():
+            analysis_label.pack()  # Ensure the label is visible when updated
+
+    # Function getting the current analysis
+    def get_analysis():
+        Evaluation = shared_state.game_actions["Eval"]
+        return "Evaluation: " + str(Evaluation)
+
+    # Toggle visibility function
+    def toggle_analysis():
+        if analysis_label.winfo_viewable():
+            analysis_label.pack_forget()
+        else:
+            update_analysis(get_analysis())  # Update and show analysis
+
+
+    toggle_button = ctk.CTkButton(control_frame, text="Show/Hide Analysis", command=toggle_analysis)
+    toggle_button.pack(pady=10)
 
     start_pygame_thread(mode=mode, color=color, difficulty=difficulty, board_size=board_size)
 
@@ -284,10 +304,8 @@ def create_game_vs_player_interface(mode, board_size):
     clear_window()
 
     # Pygame integration setup
-    # This frame would be where the Pygame window is embedded or displayed
     game_frame = tk.Frame(app, width=600, height=600)
     game_frame.pack(side="left")
-    # run_pygame_loop() is a placeholder for your function to integrate Pygame
 
     # Control buttons setup
     control_frame = ctk.CTkFrame(app)
@@ -296,38 +314,44 @@ def create_game_vs_player_interface(mode, board_size):
     draw_button = ctk.CTkButton(control_frame, text="Draw", command=draw)
     draw_button.pack(pady=10)
 
-    surrender_button = ctk.CTkButton(control_frame, text="Red surrender", command=red_surrender)
-    surrender_button.pack(pady=10)
+    red_surrender_button = ctk.CTkButton(control_frame, text="Red Surrender", command=red_surrender)
+    red_surrender_button.pack(pady=10)
 
-    surrender_button = ctk.CTkButton(control_frame, text="White surrender", command=white_surrender)
-    surrender_button.pack(pady=10)
+    white_surrender_button = ctk.CTkButton(control_frame, text="White Surrender", command=white_surrender)
+    white_surrender_button.pack(pady=10)
 
-    analysis_label = ctk.CTkLabel(app, text="Analysis: N/A")
+    # Analysis Label
+    analysis_label = ctk.CTkLabel(control_frame, text="Analysis: N/A")
     analysis_label.pack_forget()  # Initially hide the label
 
-    # Step 3: Function to Update the Label
+    # Function to Update the Label
     def update_analysis(text):
         analysis_label.configure(text=text)
-        analysis_label.pack()  # Ensure the label is visible when updated
+        if not analysis_label.winfo_viewable():
+            analysis_label.pack()  # Ensure the label is visible when updated
 
-    # Step 4: Toggle Visibility Function
+    # Function getting the current analysis
+    def get_analysis():
+        Evaluation = shared_state.game_actions["Eval"]
+        return "Evaluation: " + str(Evaluation)
+
+    # Toggle visibility function
     def toggle_analysis():
         if analysis_label.winfo_viewable():
             analysis_label.pack_forget()
         else:
-            analysis_label.pack()
+            update_analysis(get_analysis())  # Update and show analysis
 
     # Button to toggle the analysis label
-    toggle_button = ctk.CTkButton(app, text="Show/Hide Analysis", command=toggle_analysis)
-    toggle_button.pack(pady=10)
-
-    # Example of updating the label - replace this with your actual analysis update
-    update_analysis("Analysis: 1.0")
 
     return_button = ctk.CTkButton(control_frame, text="Return to the Main Menu", command=return_to_main_menu)
     return_button.pack(pady=10)
 
+    toggle_button = ctk.CTkButton(control_frame, text="Show/Hide Analysis", command=toggle_analysis)
+    toggle_button.pack(pady=10)
+
     start_pygame_thread(mode=mode, board_size=board_size)
+
 
 def draw():
     shared_state.game_actions["draw"] = True

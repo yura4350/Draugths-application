@@ -7,5 +7,6 @@ game_actions = {
     "draw_accept":False,
     "white_surrender": False,
     "red_surrender" : False,
-    "draw" : False
+    "draw" : False,
+    "Eval": 0
 }
