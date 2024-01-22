@@ -82,6 +82,10 @@ def run_pygame(mode, color=None, difficulty=None):
             if shared_state.game_actions["end_game"]:
                 # Handle surrender logic
                 run = False  # Example action: stop the game loop
+
+            if shared_state.game_actions["game_saving"]:
+                # Handle surrender logic
+                run = False  # Example action: stop the game loop
         else:
 
             if shared_state.game_actions["white_surrender"]:
@@ -99,6 +103,10 @@ def run_pygame(mode, color=None, difficulty=None):
             if shared_state.game_actions["end_game"]:
                 # Handle surrender logic
                 run = False  # Example action: stop the game loop
+
+            if shared_state.game_actions["game_saving"]:
+                # Handle surrender logic
+                run = False  # Example action: stop the game lo
 
 
         for event in pygame.event.get():

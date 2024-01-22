@@ -271,11 +271,15 @@ def create_game_vs_computer_interface(mode, color, difficulty, board_size):
     surrender_button = ctk.CTkButton(control_frame, text="Surrender", command=lambda: surrender(color))
     surrender_button.pack(pady=10)
 
+    save_button = ctk.CTkButton(control_frame, text="Save the game", command=save_game)
+    save_button.pack(pady=10)
+
     return_button = ctk.CTkButton(control_frame, text="Return to the Main Menu", command=return_to_main_menu)
     return_button.pack(pady=10)
 
     analysis_label = ctk.CTkLabel(control_frame, text="Analysis: N/A")
     analysis_label.pack_forget()  # Initially hide the label
+
 
     def update_analysis(text):
         analysis_label.configure(text=text)
@@ -319,6 +323,9 @@ def create_game_vs_player_interface(mode, board_size):
 
     white_surrender_button = ctk.CTkButton(control_frame, text="White Surrender", command=white_surrender)
     white_surrender_button.pack(pady=10)
+
+    save_button = ctk.CTkButton(control_frame, text="Save the game", command=save_game)
+    save_button.pack(pady=10)
 
     # Analysis Label
     analysis_label = ctk.CTkLabel(control_frame, text="Analysis: N/A")
@@ -399,10 +406,18 @@ def return_to_main_menu():
     shared_state.game_actions["end_game"] = True
     show_main_menu()
 
-def save_game(result):
+def save_game(result=None):  # Accept 'result' as an argument, defaulting to None
+    clear_window()
+
+    shared_state.game_actions["game_saving"] = True
     save_window = ctk.CTkToplevel(app)
     save_window.title("Save Game Result")
-    save_window.geometry("300x200")
+    save_window.geometry("600x400")
+
+    if result is None:
+        ctk.CTkLabel(save_window, text="Result:").pack(pady=5)
+        result_entry = ctk.CTkEntry(save_window)
+        result_entry.pack(pady=5)
 
     ctk.CTkLabel(save_window, text="Player 1 Name:").pack(pady=5)
     player1_entry = ctk.CTkEntry(save_window)
@@ -413,8 +428,13 @@ def save_game(result):
     player2_entry.pack(pady=5)
 
     def submit_result():
+        nonlocal result  # Use nonlocal to refer to the 'result' defined in save_game
         player1 = player1_entry.get()
         player2 = player2_entry.get()
+
+        if result is None:
+            result = result_entry.get()  # Get result from user input
+
         game_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         save_result_to_db(player1, player2, result, game_date)
         save_window.destroy()
@@ -422,6 +442,8 @@ def save_game(result):
 
     submit_button = ctk.CTkButton(save_window, text="Submit", command=submit_result)
     submit_button.pack(pady=10)
+
+# Call save_game() with or without the 'result' parameter as needed
 
 def save_result_to_db(player1, player2, result, game_date):
     conn = sqlite3.connect('game_results.db')

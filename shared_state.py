@@ -8,5 +8,9 @@ game_actions = {
     "white_surrender": False,
     "red_surrender" : False,
     "draw" : False,
-    "Eval": 0
+    "Eval": 0,
+    "game_saving" : False
+    #check if the game should be finished due to no figures present
+    #"finish_game - no figures": False,
+
 }
