@@ -43,14 +43,19 @@ class TelegramBot:
             if self.check_credentials(username, password):
                 self.user_data[user_id]['logged_in'] = True
                 markup = self.create_game_history_button()
-                self.bot.send_message(user_id, 'Login successful!', reply_markup=markup)
+                self.bot.send_message(user_id, 'Login successful! Click the button below to view game history.',
+                                      reply_markup=markup)
             else:
-                self.bot.send_message(user_id, 'Login failed. Please check your username and password and try to re-login by clicking /start.')
-                del self.user_data[user_id]  # Clear user data if login fails
+                self.bot.send_message(user_id,
+                                      'Login failed. Please check your username and password and use /start to try again.')
+
+            # Optionally, you can clear the user data here or after showing the history
+            # del self.user_data[user_id]
 
         except Exception as e:
-            self.bot.reply_to(message, 'Login failed. Please check your username and password and try to re-login by clicking /start.')
-            del self.user_data[user_id]  # Clear user data on exception
+            self.bot.reply_to(message, 'An error occurred. Please try again using /start.')
+
+
 
     def create_game_history_button(self):
         markup = types.InlineKeyboardMarkup()
@@ -66,9 +71,10 @@ class TelegramBot:
                 self.bot.send_message(call.message.chat.id, history, parse_mode='HTML')
             else:
                 self.bot.send_message(call.message.chat.id, "No game history found.")
+            self.bot.send_message(call.message.chat.id, "Use /start to return to the main menu.")
             del self.user_data[user_id]  # Clear user data after showing history
         else:
-            self.bot.send_message(call.message.chat.id, "You need to log in first.")
+            self.bot.send_message(call.message.chat.id, "You need to log in first. Use /start to begin.")
 
     def check_credentials(self, username, provided_password):
         conn = sqlite3.connect('users.db')
