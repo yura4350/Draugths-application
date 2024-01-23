@@ -91,27 +91,6 @@ def show_registration_form():
     back_button = ctk.CTkButton(app, text="Sign-in", command=show_main_menu)
     back_button.pack(pady=10)
 
-
-# Example users
-add_user("user1", "pass1")
-add_user("user2", "pass2")
-
-app = ctk.CTk()
-app.title('Draughts Game Login')
-app.geometry('1000x800')
-
-username_entry = ctk.CTkEntry(app, placeholder_text="Username")
-username_entry.pack(pady=10)
-
-password_entry = ctk.CTkEntry(app, placeholder_text="Password", show="*")
-password_entry.pack(pady=10)
-
-register_button = ctk.CTkButton(app, text="Register New User", command=show_registration_form)
-register_button.pack(pady=10)
-
-status_label = ctk.CTkLabel(app, text="")
-status_label.pack(pady=10)
-
 def attempt_login():
     username = username_entry.get()
     password = password_entry.get()
@@ -121,8 +100,33 @@ def attempt_login():
     else:
         status_label.configure(text="Login Failed. Try again.")
 
-login_button = ctk.CTkButton(app, text="Login", command=attempt_login)
+app = ctk.CTk()
+app.title('Draughts Game Login')
+app.geometry('1000x800')
+
+# Title Label
+title_label = ctk.CTkLabel(app, text="Log-in", font=("Roboto Medium", 16))
+title_label.pack(pady=20)
+
+# Username Entry
+username_entry = ctk.CTkEntry(app, placeholder_text="Username")
+username_entry.pack(pady=10)
+
+# Password Entry
+password_entry = ctk.CTkEntry(app, placeholder_text="Password", show="*")
+password_entry.pack(pady=10)
+
+# Login Button
+login_button = ctk.CTkButton(app, text="Log-in", command=attempt_login)
 login_button.pack(pady=10)
+
+# Register Button
+register_button = ctk.CTkButton(app, text="Sign-Up", command=show_registration_form)
+register_button.pack(pady=10)
+
+# Status Label
+status_label = ctk.CTkLabel(app, text="")
+status_label.pack(pady=10)
 
 # This function will be called after a successful login
 def show_main_menu():
