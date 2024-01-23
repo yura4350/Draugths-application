@@ -12,6 +12,9 @@ import shared_state
 from datetime import datetime
 import load_game_history
 
+# Global variable to store the logged-in user's username
+logged_in_username = None
+
 def setup_users_database():
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
@@ -68,7 +71,7 @@ def add_user(username, password):
 
 def show_registration_form():
     clear_window()
-    app.title('Register New User')
+    app.title('Sign-up')
 
     username_reg_entry = ctk.CTkEntry(app, placeholder_text="Username")
     username_reg_entry.pack(pady=10)
@@ -77,10 +80,13 @@ def show_registration_form():
     password_reg_entry.pack(pady=10)
 
     def attempt_registration():
+        global logged_in_username
+
         username = username_reg_entry.get()
         password = password_reg_entry.get()
         if add_user(username, password):
             tkinter.messagebox.showinfo("Registration", "Registration successful!")
+            logged_in_username = username
             show_main_menu()  # Or any other appropriate action
         else:
             tkinter.messagebox.showerror("Registration", "Username already exists!")
@@ -92,13 +98,16 @@ def show_registration_form():
     back_button.pack(pady=10)
 
 def attempt_login():
+    global logged_in_username
     username = username_entry.get()
     password = password_entry.get()
     if check_credentials(username, password):
         status_label.configure(text="Login Successful!")
+        logged_in_username = username  # Update the global variable
         show_main_menu()
     else:
         status_label.configure(text="Login Failed. Try again.")
+
 
 app = ctk.CTk()
 app.title('Draughts Game Login')
@@ -151,7 +160,11 @@ def start_game():
     choose_game_type()
 
 def load_game():
-    load_game_history.load_game_history()
+    if logged_in_username is not None:
+        load_game_history.load_game_history(logged_in_username)  # Pass the username
+    else:
+        # the case where no user is logged in
+        print("No user is logged in.")
 
 def quit_to_desktop():
     sys.exit()
@@ -412,6 +425,7 @@ def return_to_main_menu():
     shared_state.game_actions["end_game"] = True
     show_main_menu()
 
+# Call save_game() with or without the 'result' parameter as needed
 def save_game(result=None):  # Accept 'result' as an argument, defaulting to None
     clear_window()
 
@@ -449,7 +463,6 @@ def save_game(result=None):  # Accept 'result' as an argument, defaulting to Non
     submit_button = ctk.CTkButton(save_window, text="Submit", command=submit_result)
     submit_button.pack(pady=10)
 
-# Call save_game() with or without the 'result' parameter as needed
 
 def save_result_to_db(player1, player2, result, game_date):
     conn = sqlite3.connect('game_results.db')
