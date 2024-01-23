@@ -66,9 +66,6 @@ def check_credentials(username, provided_password):
     else:
         return False
 
-
-
-
 def add_user(username, password):
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
