@@ -11,6 +11,8 @@ from checkers.constants import *
 import shared_state
 from datetime import datetime
 import load_game_history
+import hashlib
+import os
 
 # Global variable to store the logged-in user's username
 logged_in_username = None
@@ -51,17 +53,21 @@ def setup_game_results_database():
 
 setup_game_results_database()
 
-def check_credentials(username, password):
+def check_credentials(username, provided_password):
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
     cursor.execute('SELECT password FROM users WHERE username=?', (username,))
     result = cursor.fetchone()
     conn.close()
 
-    if result and result[0] == password:
-        return True
+    if result:
+        stored_password = result[0]  # It's already a bytes object
+        return verify_password(stored_password, provided_password)
     else:
         return False
+
+
+
 
 def add_user(username, password):
     conn = sqlite3.connect('users.db')
@@ -69,10 +75,29 @@ def add_user(username, password):
     cursor.execute('SELECT * FROM users WHERE username=?', (username,))
     if cursor.fetchone():
         return False  # User already exists
-    cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
+
+    hashed_password = hash_password(password)  # Hash the password
+    cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, hashed_password))
     conn.commit()
     conn.close()
     return True
+
+def hash_password(password):
+    """Hash a password for storing."""
+    salt = os.urandom(32)  # A new salt for this user
+    pwdhash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
+    return salt + pwdhash
+
+def verify_password(stored_password, provided_password):
+    """Verify a stored password against one provided by user."""
+    salt = stored_password[:32]  # 32 is the length of the salt
+    stored_pwdhash = stored_password[32:]
+    pwdhash = hashlib.pbkdf2_hmac('sha256',
+                                  provided_password.encode('utf-8'),
+                                  salt,
+                                  100000)
+    return pwdhash == stored_pwdhash
+
 
 def show_registration_form():
     clear_window()
