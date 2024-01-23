@@ -14,6 +14,11 @@ import load_game_history
 
 # Global variable to store the logged-in user's username
 logged_in_username = None
+app = None
+status_label = None
+app = ctk.CTk()
+app.title('Draughts Game Login')
+app.geometry('1000x800')
 
 def setup_users_database():
     conn = sqlite3.connect('users.db')
@@ -73,6 +78,10 @@ def show_registration_form():
     clear_window()
     app.title('Sign-up')
 
+    # Title Label
+    title_label = ctk.CTkLabel(app, text="Sign-up", font=("Roboto Medium", 16))
+    title_label.pack(pady=20)
+
     username_reg_entry = ctk.CTkEntry(app, placeholder_text="Username")
     username_reg_entry.pack(pady=10)
 
@@ -94,13 +103,14 @@ def show_registration_form():
     register_button = ctk.CTkButton(app, text="Register", command=attempt_registration)
     register_button.pack(pady=10)
 
-    back_button = ctk.CTkButton(app, text="Sign-in", command=show_main_menu)
+    back_button = ctk.CTkButton(app, text="Log-in", command=show_login_page)
     back_button.pack(pady=10)
 
-def attempt_login():
+def attempt_login(username_entry, password_entry):
     global logged_in_username
     username = username_entry.get()
     password = password_entry.get()
+    global status_label
     if check_credentials(username, password):
         status_label.configure(text="Login Successful!")
         logged_in_username = username  # Update the global variable
@@ -109,33 +119,34 @@ def attempt_login():
         status_label.configure(text="Login Failed. Try again.")
 
 
-app = ctk.CTk()
-app.title('Draughts Game Login')
-app.geometry('1000x800')
+def show_login_page():
+    global app
+    clear_window()
 
-# Title Label
-title_label = ctk.CTkLabel(app, text="Log-in", font=("Roboto Medium", 16))
-title_label.pack(pady=20)
+    # Title Label
+    title_label = ctk.CTkLabel(app, text="Log-in", font=("Roboto Medium", 16))
+    title_label.pack(pady=20)
 
-# Username Entry
-username_entry = ctk.CTkEntry(app, placeholder_text="Username")
-username_entry.pack(pady=10)
+    # Username Entry
+    username_entry = ctk.CTkEntry(app, placeholder_text="Username")
+    username_entry.pack(pady=10)
 
-# Password Entry
-password_entry = ctk.CTkEntry(app, placeholder_text="Password", show="*")
-password_entry.pack(pady=10)
+    # Password Entry
+    password_entry = ctk.CTkEntry(app, placeholder_text="Password", show="*")
+    password_entry.pack(pady=10)
 
-# Login Button
-login_button = ctk.CTkButton(app, text="Log-in", command=attempt_login)
-login_button.pack(pady=10)
+    # Login Button
+    login_button = ctk.CTkButton(app, text="Log-in", command=lambda: attempt_login(username_entry, password_entry))
+    login_button.pack(pady=10)
 
-# Register Button
-register_button = ctk.CTkButton(app, text="Sign-Up", command=show_registration_form)
-register_button.pack(pady=10)
+    # Register Button
+    register_button = ctk.CTkButton(app, text="Sign-Up", command=show_registration_form)
+    register_button.pack(pady=10)
 
-# Status Label
-status_label = ctk.CTkLabel(app, text="")
-status_label.pack(pady=10)
+    # Status Label
+    global status_label
+    status_label = ctk.CTkLabel(app, text="")
+    status_label.pack(pady=10)
 
 # This function will be called after a successful login
 def show_main_menu():
@@ -472,5 +483,5 @@ def save_result_to_db(player1, player2, result, game_date):
     conn.commit()
     conn.close()
 
-
+show_login_page()
 app.mainloop()
