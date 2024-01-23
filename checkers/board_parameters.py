@@ -15,6 +15,7 @@ def get_height():
 
 def get_rows():
     return _rows
+
 def get_cols():
     return _cols
 

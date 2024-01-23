@@ -10,6 +10,7 @@ from pygame_part import *
 from checkers.constants import *
 import shared_state
 from datetime import datetime
+import load_game_history
 
 def setup_users_database():
     conn = sqlite3.connect('users.db')
@@ -123,15 +124,6 @@ def attempt_login():
 login_button = ctk.CTkButton(app, text="Login", command=attempt_login)
 login_button.pack(pady=10)
 
-def start_game():
-    choose_game_type()
-
-def load_game():
-    tkinter.messagebox.showinfo("Load Game", "Loading a game...")
-
-def quit_to_desktop():
-    sys.exit()
-
 # This function will be called after a successful login
 def show_main_menu():
     clear_window()
@@ -144,11 +136,21 @@ def show_main_menu():
     start_game_button = ctk.CTkButton(app, text="Start a Game", command=start_game)
     start_game_button.pack(pady=10)
 
-    load_game_button = ctk.CTkButton(app, text="Load a Game", command=load_game)
+    load_game_button = ctk.CTkButton(app, text="Load a game history", command=load_game)
     load_game_button.pack(pady=10)
 
     quit_button = ctk.CTkButton(app, text="Quit to the Desktop", command=quit_to_desktop)
     quit_button.pack(pady=10)
+
+
+def start_game():
+    choose_game_type()
+
+def load_game():
+    load_game_history.load_game_history()
+
+def quit_to_desktop():
+    sys.exit()
 
 
 def choose_game_type():
