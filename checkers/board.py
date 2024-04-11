@@ -27,7 +27,8 @@ class Board:
         win.fill(BLACK)
         for row in range(self.ROWS):
             for col in range(row % 2, self.COLS, 2):
-                pygame.draw.rect(win, RED, (row * self.SQUARE_SIZE, col * self.SQUARE_SIZE, self.SQUARE_SIZE, self.SQUARE_SIZE))
+                pygame.draw.rect(win, RED, (row * self.SQUARE_SIZE, col * self.SQUARE_SIZE,
+                                            self.SQUARE_SIZE, self.SQUARE_SIZE))
 
     def evaluate(self):
         evaluation = self.white_left - self.red_left + (self.white_kings * 2 - self.red_kings * 2)
@@ -271,7 +272,9 @@ class Board:
                 if last:
                     if step == -1:
 
-                        #created row and opposite_row to have the ability to move upwards and downwards by any piece (row - maximum in the direction we moved in before, opposite_row - the opposite direction)
+                        #created row and opposite_row to have the ability to move upwards
+                        # and downwards by any piece (row - maximum in the direction we moved in before,
+                        # opposite_row - the opposite direction)
                         row = max(r - 3, -1)
                         opposite_row = min(r + 3, self.ROWS)
                     else:
@@ -279,9 +282,12 @@ class Board:
                         opposite_row = max(r - 3, -1)
                     #record the current length of dict moves
                     length = [len(moves)]
-                    moves.update(self._traverse_left(r + step, row, step, color, left - 1, initial_position, skipped=last + skipped))
-                    moves.update(self._traverse_right(r + step, row, step, color, left + 1, initial_position, skipped=last + skipped))
-                    moves.update(self._traverse_left(r-step, opposite_row, -step, color, left-1, initial_position, skipped=last + skipped))
+                    moves.update(self._traverse_left(r + step, row, step, color, left - 1,
+                                                     initial_position, skipped=last + skipped))
+                    moves.update(self._traverse_right(r + step, row, step, color, left + 1,
+                                                      initial_position, skipped=last + skipped))
+                    moves.update(self._traverse_left(r-step, opposite_row, -step, color, left-1,
+                                                     initial_position, skipped=last + skipped))
 
                     # if len(moves) > length[0]:
                     #     delete_pair_by_value(moves, last)

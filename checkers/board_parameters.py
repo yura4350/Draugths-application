@@ -37,4 +37,3 @@ def set_rows_cols(rows, cols):
     _rows, _cols = rows, cols
     _square_size = _width // _cols
 
-# Load the crown image and scale it

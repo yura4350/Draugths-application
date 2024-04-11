@@ -32,7 +32,10 @@ class TelegramBot:
             }
             self.bot.send_message(message.chat.id, "Now, please enter your password:")
         except Exception as e:
-            self.bot.reply_to(message, 'Oops! Something went wrong.')
+            self.bot.reply_to(message, 'Oops! Something went wrong. '
+                                       'Probably the username you inputted has incorrect format '
+                                       'or the username you inputted does not exist'
+                                       'Please, try again.')
 
     def process_password_step(self, message):
         try:
@@ -47,15 +50,14 @@ class TelegramBot:
                                       reply_markup=markup)
             else:
                 self.bot.send_message(user_id,
-                                      'Login failed. Please check your username and password and use /start to try again.')
+                                      'Login failed. Please check your username and password '
+                                      'and use /start to try again.')
 
             # Optionally, you can clear the user data here or after showing the history
             # del self.user_data[user_id]
 
         except Exception as e:
             self.bot.reply_to(message, 'An error occurred. Please try again using /start.')
-
-
 
     def create_game_history_button(self):
         markup = types.InlineKeyboardMarkup()
@@ -77,9 +79,9 @@ class TelegramBot:
             self.bot.send_message(call.message.chat.id, "You need to log in first. Use /start to begin.")
 
     def check_credentials(self, username, provided_password):
-        conn = sqlite3.connect('users.db')
+        conn = sqlite3.connect('app_users.db')
         cursor = conn.cursor()
-        cursor.execute('SELECT password FROM users WHERE username=?', (username,))
+        cursor.execute('SELECT password FROM app_users WHERE username=?', (username,))
         result = cursor.fetchone()
         conn.close()
 
@@ -107,9 +109,9 @@ class TelegramBot:
             self.bot.reply_to(message, 'Oops! Something went wrong while retrieving game history.')
 
     def get_game_history(self, username):
-        conn = sqlite3.connect('game_results.db')
+        conn = sqlite3.connect('games.db')
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM game_results WHERE player1 = ? OR player2 = ?', (username, username))
+        cursor.execute('SELECT * FROM games WHERE player1 = ? OR player2 = ?', (username, username))
         games = cursor.fetchall()
         conn.close()
 

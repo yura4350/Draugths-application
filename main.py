@@ -23,10 +23,10 @@ app.title('Draughts Game Login')
 app.geometry('1000x800')
 
 def setup_users_database():
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('app_users.db')
     cursor = conn.cursor()
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
+        CREATE TABLE IF NOT EXISTS app_users (
             username TEXT PRIMARY KEY,
             password TEXT NOT NULL
         )
@@ -37,10 +37,10 @@ def setup_users_database():
 setup_users_database()
 
 def setup_game_results_database():
-    conn = sqlite3.connect('game_results.db')
+    conn = sqlite3.connect('games.db')
     cursor = conn.cursor()
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS game_results (
+        CREATE TABLE IF NOT EXISTS games (
             id INTEGER PRIMARY KEY,
             player1 TEXT NOT NULL,
             player2 TEXT NOT NULL,
@@ -54,9 +54,9 @@ def setup_game_results_database():
 setup_game_results_database()
 
 def check_credentials(username, provided_password):
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('app_users.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT password FROM users WHERE username=?', (username,))
+    cursor.execute('SELECT password FROM app_users WHERE username=?', (username,))
     result = cursor.fetchone()
     conn.close()
 
@@ -67,14 +67,14 @@ def check_credentials(username, provided_password):
         return False
 
 def add_user(username, password):
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('app_users.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM users WHERE username=?', (username,))
+    cursor.execute('SELECT * FROM app_users WHERE username=?', (username,))
     if cursor.fetchone():
         return False  # User already exists
 
     hashed_password = hash_password(password)  # Hash the password
-    cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, hashed_password))
+    cursor.execute('INSERT INTO app_users (username, password) VALUES (?, ?)', (username, hashed_password))
     conn.commit()
     conn.close()
     return True
@@ -481,12 +481,12 @@ def save_game(result=None):  # Accept 'result' as an argument, defaulting to Non
     player2_entry.pack(pady=5)
 
     def submit_result():
-        nonlocal result  # Use nonlocal to refer to the 'result' defined in save_game
+        nonlocal result  # Using nonlocal to refer to the 'result' defined in save_game
         player1 = player1_entry.get()
         player2 = player2_entry.get()
 
         if result is None:
-            result = result_entry.get()  # Get result from user input
+            result = result_entry.get()  # Getting result from user input
 
         game_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         save_result_to_db(player1, player2, result, game_date)
@@ -498,9 +498,9 @@ def save_game(result=None):  # Accept 'result' as an argument, defaulting to Non
 
 
 def save_result_to_db(player1, player2, result, game_date):
-    conn = sqlite3.connect('game_results.db')
+    conn = sqlite3.connect('games.db')
     cursor = conn.cursor()
-    cursor.execute('INSERT INTO game_results (player1, player2, result, game_date) VALUES (?, ?, ?, ?)',
+    cursor.execute('INSERT INTO games (player1, player2, result, game_date) VALUES (?, ?, ?, ?)',
                    (player1, player2, result, game_date))
     conn.commit()
     conn.close()

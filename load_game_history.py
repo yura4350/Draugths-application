@@ -30,8 +30,8 @@ def load_game_history(username):
     tree.pack(fill='both', expand=True)
 
     # Adjust the SQL query to filter results for the specific user
-    query = f"SELECT * FROM game_results WHERE player1 = '{username}' OR player2 = '{username}'"
-    load_data_into_treeview(tree, 'game_results.db', query)
+    query = f"SELECT * FROM games WHERE player1 = '{username}' OR player2 = '{username}'"
+    load_data_into_treeview(tree, 'games.db', query)
 
     return_button = ctk.CTkButton(root, text="Return to Main Menu", command=root.destroy)
     return_button.pack(pady=20)

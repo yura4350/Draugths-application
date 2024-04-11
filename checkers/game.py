@@ -17,7 +17,6 @@ class Game:
         self.win = win
         self.SQUARE_SIZE = board_parameters.get_square_size()
 
-
     def update(self):
         self.board.draw(self.win)
         self.draw_valid_moves(self.valid_moves)
@@ -63,7 +62,6 @@ class Game:
 
         return True
 
-    #no need yet, maybe later
     def min_amount_of_pieces(self):
 
         all_possible_boards = self.get_all_moves(self.board, self.turn, self)
@@ -89,7 +87,6 @@ class Game:
             pygame.draw.circle(self.win, BLUE,
                                     (col * self.SQUARE_SIZE + self.SQUARE_SIZE // 2, row * self.SQUARE_SIZE + self.SQUARE_SIZE // 2), 15)
 
-
     def change_turn(self):
         self.valid_moves = {}
         if self.turn == RED:
@@ -103,7 +100,3 @@ class Game:
     def ai_move(self, board):
         self.board = board
         self.change_turn()
-
-
-
-        # pygame.time.delay(100)

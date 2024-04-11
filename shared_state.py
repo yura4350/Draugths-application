@@ -1,4 +1,4 @@
-# Global state for communication between pygame_part and main (pygame and tkinter)
+# Global state for communication between pygame_part and main (pygame and CustomTkinter)
 game_actions = {
     "offer_draw": False,
     "surrender": False,
@@ -12,5 +12,6 @@ game_actions = {
     "game_saving" : False
     #check if the game should be finished due to no figures present
     #"finish_game - no figures": False,
-
 }
+
+
