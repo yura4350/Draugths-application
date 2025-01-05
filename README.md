@@ -1,1 +1,3 @@
-Internal Assesment for the IB Computer Science HL course - implementation of the draughts game with the artificial opponent implemented on the basis of alpha-beta prunning algorithm
+Internal Assesment for the IB Computer Science HL course
+
+Draughts application, implementing both PvP and PvE modes, as well as SQL databases, telegram bot, and AI based on alpha-beta prunning algorithm
